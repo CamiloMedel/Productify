@@ -18,7 +18,7 @@ struct ContentView: View {
         TabView {
             Tab("Timers", systemImage: "timer") {
                 NavigationStack {
-                    TimerView()
+                    TimersView()
                 }
             }
             

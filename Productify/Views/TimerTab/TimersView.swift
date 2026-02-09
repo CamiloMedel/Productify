@@ -8,7 +8,7 @@
 import SwiftUI
 import _SwiftData_SwiftUI
 
-struct TimerView: View {
+struct TimersView: View {
     @Query(sort: \Category.name) private var categories: [Category]
     
     let columns: [GridItem] = [
@@ -47,7 +47,7 @@ struct TimerView: View {
 }
 
 // MARK: Subviews
-private extension TimerView {
+private extension TimersView {
     struct CategoryTile: View {
         let title: String
         var icon: Image

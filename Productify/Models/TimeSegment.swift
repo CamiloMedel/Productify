@@ -15,9 +15,12 @@ class TimeSegment {
     var kind: SegmentKind
     var durationSeconds: Int?
     
-    init(order: Int, kind: SegmentKind, durationSeconds: Int?){
+    var config: TimerConfig
+    
+    init(order: Int, kind: SegmentKind, durationSeconds: Int?, config: TimerConfig){
         self.order = order
         self.kind = kind
         self.durationSeconds = durationSeconds
+        self.config = config
     }
 }

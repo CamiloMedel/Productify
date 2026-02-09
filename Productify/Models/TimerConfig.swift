@@ -14,11 +14,14 @@ class TimerConfig {
     var name: String
     var mode: TimerMode
     
-    @Relationship(deleteRule: .cascade)
+    var category: Category
+    
+    @Relationship(deleteRule: .cascade, inverse: \TimeSegment.config)
     var segments: [TimeSegment] = []
     
-    init(name: String, mode: TimerMode) {
+    init(name: String, mode: TimerMode, category: Category) {
         self.name = name
         self.mode = mode
+        self.category = category
     }
 }

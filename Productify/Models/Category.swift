@@ -15,7 +15,7 @@ class Category {
     var icon: String
     var colorHex: String
     
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .cascade, inverse: \TimerConfig.category)
     var configs: [TimerConfig] = []
     
     init(name: String, icon: String, colorHex: String) {
