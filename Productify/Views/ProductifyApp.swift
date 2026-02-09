@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import SwiftData
 
 @main
 struct ProductifyApp: App {
@@ -15,7 +16,7 @@ struct ProductifyApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
+        .modelContainer(for: [Category.self, TimerConfig.self, TimeSegment.self])
     }
 }

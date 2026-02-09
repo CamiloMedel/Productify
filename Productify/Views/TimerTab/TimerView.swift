@@ -6,12 +6,30 @@
 //
 
 import SwiftUI
+import _SwiftData_SwiftUI
 
 struct TimerView: View {
+    @Query(sort: \Category.name) private var categories: [Category]
+    
+    let columns: [GridItem] = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
     
     var body: some View {
         VStack {
-            CategoryTile(title: "Workout", bgIcon: nil, color: Color.red)
+            LazyVGrid(columns: columns, spacing: 20) {
+                ForEach(categories) { category in
+                    CategoryTile(
+                        title: category.name,
+                        icon: Image(systemName: category.icon),
+                        color: Color(hex: category.colorHex)
+                    )
+                }
+            }
+            .padding(.horizontal)
+            
+            Spacer()
         }
         .navigationTitle(Text("Timers"))
         .toolbar {
@@ -32,40 +50,31 @@ struct TimerView: View {
 private extension TimerView {
     struct CategoryTile: View {
         let title: String
-        var bgIcon: Image?
+        var icon: Image
         var color: Color
         
         var body: some View {
             ZStack {
-                // background
+                // background with tint
                 ZStack {
                     RoundedRectangle(cornerRadius: 16)
                         .frame(height: 100)
                         .foregroundColor(color)
-                    
-                    if let bgIcon {
-                        bgIcon
-                    }
-                    
-                }
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.black.opacity(0.1))
                 }
                 
-                // tint
-                
-                
-                // text
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                
+                VStack {
+                    icon
+                    // text
+                    Text(title)
+                        .font(.headline)
+                }
+                .foregroundColor(.white)
             }
         }
     }
 }
 
 #Preview {
-    TimerView()
+    //TimerView()
+    
 }

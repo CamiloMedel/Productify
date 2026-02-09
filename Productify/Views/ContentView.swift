@@ -9,6 +9,11 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
+    @Environment(\.modelContext) private var modelContext
+    @AppStorage("hasSeededDefaults") private var hasSeededDefaults = false
+    
+    private let seeder = DataSeeder()
+    
     var body: some View {
         TabView {
             Tab("Timers", systemImage: "timer") {
@@ -23,9 +28,14 @@ struct ContentView: View {
                 }
             }
         }
+        .task {
+            guard !hasSeededDefaults else { return }
+            await seeder.seedDefaults(into: modelContext)
+            hasSeededDefaults = true
+        }
     }
 }
 
 #Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    ContentView()
 }
