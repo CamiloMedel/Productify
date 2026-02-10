@@ -7,4 +7,5 @@
 
 enum Route: Hashable {
     case timerListings(category: Category)
+    case timer(configuration: TimerConfig)
 }
