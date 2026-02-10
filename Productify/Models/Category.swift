@@ -6,11 +6,13 @@
 //
 
 import SwiftData
+import Foundation
 
 /// Represents a timer category ( user made or default )
 /// Stores the categories' name, icon, color hex, and as well as the relationship to the configurations it owns
 @Model
 class Category {
+    var id: UUID = UUID()
     var name: String
     var icon: String
     var colorHex: String

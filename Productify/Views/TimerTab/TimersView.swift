@@ -11,6 +11,9 @@ import _SwiftData_SwiftUI
 struct TimersView: View {
     @Query(sort: \Category.name) private var categories: [Category]
     
+    @Binding var path: [Route]
+    let namespace: Namespace.ID
+    
     let columns: [GridItem] = [
         GridItem(.flexible()),
         GridItem(.flexible())
@@ -25,6 +28,10 @@ struct TimersView: View {
                         icon: Image(systemName: category.icon),
                         color: Color(hex: category.colorHex)
                     )
+                    .onTapGesture {
+                        path.append(.timerListings(category: category))
+                    }
+                    .matchedTransitionSource(id: category.id, in: namespace)
                 }
             }
             .padding(.horizontal)

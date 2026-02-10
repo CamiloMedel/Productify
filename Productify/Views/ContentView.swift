@@ -12,18 +12,29 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage("hasSeededDefaults") private var hasSeededDefaults = false
     
+    // navigation vars
+    @State private var path: [Route] = []
+    @Namespace private var ns
+    
     private let seeder = DataSeeder()
     
     var body: some View {
         TabView {
             Tab("Timers", systemImage: "timer") {
-                NavigationStack {
-                    TimersView()
+                NavigationStack(path: $path) {
+                    TimersView(path: $path, namespace: ns)
+                        .navigationDestination(for: Route.self) { route in
+                            switch route {
+                            case .timerListings(let category):
+                                TimerListingsView(category: category)
+                                    .navigationTransition(.zoom(sourceID: category.id, in: ns))
+                            }
+                        }
                 }
             }
             
             Tab("Planner", systemImage: "book") {
-                NavigationStack {
+                NavigationStack(path: $path) {
                     PlannerView()
                 }
             }
