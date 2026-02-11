@@ -8,10 +8,18 @@
 import SwiftUI
 
 struct TimerView: View {
+    @StateObject private var viewModel = TimerViewModel()
     let configuration: TimerConfig
     var body: some View {
         VStack {
+            Text(viewModel.displayTime)
+                .font(.system(size: 64, weight: .semibold, design: .rounded))
             
+            Button {
+                
+            } label: {
+                
+            }
         }
         .navigationTitle(configuration.name)
         .toolbar {
