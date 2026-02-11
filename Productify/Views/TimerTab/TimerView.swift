@@ -8,17 +8,23 @@
 import SwiftUI
 
 struct TimerView: View {
-    @StateObject private var viewModel = TimerViewModel()
+    @StateObject private var viewModel: TimerViewModel
     let configuration: TimerConfig
+    
+    init(configuration: TimerConfig) {
+        self.configuration = configuration
+        _viewModel = StateObject(wrappedValue: TimerViewModel(mode: configuration.mode))
+    }
+    
     var body: some View {
         VStack {
             Text(viewModel.displayTime)
                 .font(.system(size: 64, weight: .semibold, design: .rounded))
-            
+                .monospacedDigit()
             Button {
-                
+                viewModel.togglePlayPause()
             } label: {
-                
+                Text(buttonTitle)
             }
         }
         .navigationTitle(configuration.name)
@@ -30,6 +36,15 @@ struct TimerView: View {
                     Image(systemName: "ellipsis")
                 }
             }
+        }
+    }
+    
+    private var buttonTitle: String {
+        switch viewModel.state {
+        case .idle: "Start"
+        case .running: "Pause"
+        case .paused: "Resume"
+        case .finished: "Restart"
         }
     }
 }
