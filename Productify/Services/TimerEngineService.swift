@@ -27,14 +27,13 @@ final class TimerEngineService {
     private var lastTick: Date?
     
     init(mode: TimerMode, countdownSeconds: TimeInterval = 0) {
-        // setup mode, initial timer length, and remaining time
         self.mode = mode
         self.initialDuration = max(0, countdownSeconds)
         self.remaining = max(0, countdownSeconds)
     }
     
+    /// On call of toggle, determine what action to take based on current timer state/
     func toggle() {
-        // On call of toggle, determine what action to take based on current timer state
         switch state {
         case .idle: start()
         case .running: pause()
@@ -43,6 +42,7 @@ final class TimerEngineService {
         }
     }
     
+    /// Starts a timer's ticking, configured according to the timer's type
     func start(){
         if mode == .countdown {
             // for countdown timers we count down from the initial duration
@@ -67,14 +67,67 @@ final class TimerEngineService {
         notifyDelegate()
     }
     
-    func pause(){}
+    /// Pauses the timer from ticking
+    func pause(){
+        state = .paused
+        timer?.invalidate()
+        timer = nil
+        lastTick = nil
+        notifyDelegate()
+    }
     
-    func resume(){}
+    /// Resume the timers ticking
+    func resume(){
+        state = .running
+        lastTick = Date()
+        // resume the timer by calling the tick function at every passing second again
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            self?.tick()
+        }
+        notifyDelegate()
+    }
     
-    func reset(){}
+    /// Resets the timer by resetting it's tick, remaining time, and setting it back to idle
+    func reset(){
+        // resets the timer
+        timer?.invalidate()
+        timer = nil
+        lastTick = nil
+        state = .idle
+        elapsed = 0
+        remaining = mode == .countdown ? initialDuration : 0
+        notifyDelegate()
+    }
     
-    private func tick(){}
+    /// For stopwatch timers, updates elapsed time by adding delta ( CurrentTime - lastTicksTime)
+    /// For countdown timers, updates remaining time by subtracting delta ( CurrentTime - lastTicksTime)
+    /// Should be called on every second change within TimerEngineService to run ticking mechanics as each second passes
+    private func tick(){
+        // calculate the change in time from the last tick
+        let now = Date()
+        let delta = now.timeIntervalSince(lastTick ?? now)
+        lastTick = now
+        
+        switch mode {
+        case .stopwatch:
+            // add the change in time to the elapsed time to act as a stopwatch
+            elapsed += delta
+        case .countdown:
+            // remove the change in time from the remaining time to act as a timer
+            remaining -= delta
+            // if the timer is out of remaining time, end the timer
+            if remaining <= 0 {
+                state = .finished
+                timer?.invalidate()
+                timer = nil
+                lastTick = nil
+            }
+        }
+        
+        notifyDelegate()
+    }
     
+    // Should be called on every time tick by TimerEngineService to allow delegate to respond to each tick
     func notifyDelegate() {
         delegate?.timerDidTick(elapsed: elapsed, remaining: remaining, state: state)
     }
