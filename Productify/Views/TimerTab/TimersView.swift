@@ -23,7 +23,7 @@ struct TimersView: View {
     
     var body: some View {
         VStack {
-            LazyVGrid(columns: columns, spacing: 20) {
+            LazyVGrid(columns: columns) {
                 ForEach(categories) { category in
                     CategoryTile(
                         title: category.name,

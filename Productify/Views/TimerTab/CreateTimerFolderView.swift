@@ -6,10 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct CreateTimerFolderView: View {
-    @State private var readyToCreate: Bool = false
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    
+    private var isReadyToCreate: Bool {
+        return !name.isEmpty
+    }
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
     
     // properties needed to make category folder
     @State private var name: String = ""
@@ -64,13 +71,35 @@ struct CreateTimerFolderView: View {
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
+                    // create folder
                     Button {
-                        
+                        // validate if folder is ready to be created, else alert user
+                        if isReadyToCreate {
+                            // create folder
+                            let category = Category(name: name, icon: symbol, colorHex: UIColor(color).toHexString())
+                            modelContext.insert(category)
+                            do {
+                                try modelContext.save()
+                                dismiss()
+                            } catch {
+                                alertMessage = "Error saving category. Please try again."
+                                showAlert = true
+                            }
+                            
+                        } else {
+                            // Not ready error only occurs when name field is missing
+                            alertMessage = "Please enter a name for the folder."
+                            showAlert = true
+                        }
                     } label: {
                         Label("Create", systemImage: "checkmark")
                     }
-                    .tint(readyToCreate ? nil : Color(UIColor.systemGray3))
+                    .tint(isReadyToCreate ? nil : Color(UIColor.systemGray3))
+                    
                 }
+            }
+            .alert(isPresented: $showAlert) {
+                Alert(title: Text("Error Creating Folder"), message: Text(alertMessage))
             }
         }
     }
