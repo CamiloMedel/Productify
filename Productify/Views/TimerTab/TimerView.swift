@@ -13,7 +13,10 @@ struct TimerView: View {
     
     init(configuration: TimerConfig) {
         self.configuration = configuration
-        _viewModel = StateObject(wrappedValue: TimerViewModel(mode: configuration.mode))
+        
+        // set up view with intial timer duration if duration exists (countdown mode)
+        let initialDuration = TimeInterval(configuration.segments[0].durationSeconds ?? 0)
+        _viewModel = StateObject(wrappedValue: TimerViewModel(mode: configuration.mode, countdownSeconds: initialDuration, timeSegments: configuration.segments))
     }
     
     var body: some View {

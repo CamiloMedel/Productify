@@ -16,10 +16,22 @@ class TimerViewModel: ObservableObject, TimerEngineDelegate {
     private let mode: TimerMode
     private let engine: TimerEngineService
     
-    init(mode: TimerMode, countdownSeconds: TimeInterval = 0) {
+    // time segmentation properties
+    private var currSegmentIndex = 0
+    private var segments: [TimeSegment] = []
+    private var hasNextSegment: Bool {
+        if currSegmentIndex + 1 < segments.count { return true }
+        return false
+    }
+    private var didAdvanceOnFinish = false
+    
+    init(mode: TimerMode, countdownSeconds: TimeInterval = 0, timeSegments: [TimeSegment]) {
         self.mode = mode
         self.engine = TimerEngineService(mode: mode, countdownSeconds: countdownSeconds)
         self.engine.delegate = self
+        self.segments = timeSegments
+        // initial display update
+        updateDisplay(elapsed: 0, remaining: countdownSeconds, state: state)
     }
     
     /// Plays and pauses the timer
@@ -30,6 +42,13 @@ class TimerViewModel: ObservableObject, TimerEngineDelegate {
     
     /// Called by TimerEngineService in order to update UI on each second tick call
     func timerDidTick(elapsed: TimeInterval, remaining: TimeInterval, state: TimerRunState) {
+        // start next time segment if available, once a current segment is ended
+        if state == .finished && hasNextSegment && !didAdvanceOnFinish {
+            didAdvanceOnFinish = true // used to avoid timing scenario where this method is called multiple times on a finished state
+            currSegmentIndex += 1
+            engine.load(duration: TimeInterval(segments[currSegmentIndex].durationSeconds!))
+            engine.start()
+        }
         updateDisplay(elapsed: elapsed, remaining: remaining, state: state)
     }
     

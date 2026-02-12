@@ -17,7 +17,7 @@ final class TimerEngineService {
     weak var delegate: TimerEngineDelegate?
     
     private let mode: TimerMode
-    private let initialDuration: TimeInterval
+    private var loadedDuration: TimeInterval
     private var state: TimerRunState = .idle
     
     private var elapsed: TimeInterval = 0
@@ -28,7 +28,7 @@ final class TimerEngineService {
     
     init(mode: TimerMode, countdownSeconds: TimeInterval = 0) {
         self.mode = mode
-        self.initialDuration = max(0, countdownSeconds)
+        self.loadedDuration = max(0, countdownSeconds)
         self.remaining = max(0, countdownSeconds)
     }
     
@@ -46,7 +46,7 @@ final class TimerEngineService {
     func start(){
         if mode == .countdown {
             // for countdown timers we count down from the initial duration
-            remaining = initialDuration
+            remaining = loadedDuration
             
             // if timer starts with 0 or less than 0 seconds, automatically end timer
             if remaining <= 0 {
@@ -95,7 +95,24 @@ final class TimerEngineService {
         lastTick = nil
         state = .idle
         elapsed = 0
-        remaining = mode == .countdown ? initialDuration : 0
+        remaining = mode == .countdown ? loadedDuration : 0
+        notifyDelegate()
+    }
+    
+    /// Loads a new time duration (for starting another time segment if needed)
+    func load(duration: TimeInterval) {
+        // Stop the current timer if any
+        timer?.invalidate()
+        timer = nil
+        lastTick = nil
+        
+        // update time duration
+        loadedDuration = max(0, duration)
+        
+        // reset counters
+        elapsed = 0
+        remaining = mode == .countdown ? loadedDuration : 0
+        state = .idle
         notifyDelegate()
     }
     
