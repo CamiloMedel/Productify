@@ -19,6 +19,8 @@ struct TimersView: View {
         GridItem(.flexible())
     ]
     
+    @State private var showCreateTimerFolderView: Bool = false
+    
     var body: some View {
         VStack {
             LazyVGrid(columns: columns, spacing: 20) {
@@ -43,42 +45,18 @@ struct TimersView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     // allow user to add a tile
+                    showCreateTimerFolderView = true
                 } label: {
                     Image(systemName: "plus")
                 }
             }
         }
+        .sheet(isPresented: $showCreateTimerFolderView) {
+            CreateTimerFolderView()
+        }
     }
     
 
-}
-
-// MARK: Subviews
-private extension TimersView {
-    struct CategoryTile: View {
-        let title: String
-        var icon: Image
-        var color: Color
-        
-        var body: some View {
-            ZStack {
-                // background with tint
-                ZStack {
-                    RoundedRectangle(cornerRadius: 16)
-                        .frame(height: 100)
-                        .foregroundColor(color)
-                }
-                
-                VStack {
-                    icon
-                    // text
-                    Text(title)
-                        .font(.headline)
-                }
-                .foregroundColor(.white)
-            }
-        }
-    }
 }
 
 #Preview {
