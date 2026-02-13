@@ -50,6 +50,14 @@ struct TimersView: View {
                     Image(systemName: "plus")
                 }
             }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    // Open timers views options
+                } label: {
+                    Image(systemName: "ellipsis")
+                }
+            }
         }
         .sheet(isPresented: $showCreateTimerFolderView) {
             CreateTimerFolderView()

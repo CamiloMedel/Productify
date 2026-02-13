@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TimerListingsView: View {
     let category: Category
+    @State private var showCreateTimerView: Bool = false
     
     var body: some View {
         List {
@@ -33,19 +34,36 @@ struct TimerListingsView: View {
                         }
                     }
                 }
+                
+                if category.configs.isEmpty {
+                 
+                    Text("No configurations yet.")
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
             }
         }
         .navigationTitle(category.name)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    // Settings button
+                    // Create timer
+                    showCreateTimerView = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    // Open timer listings options
                 } label: {
                     Image(systemName: "ellipsis")
                 }
             }
         }
-        
+        .sheet(isPresented: $showCreateTimerView) {
+            CreateTimerView(category: category)
+        }
     }
 }
 

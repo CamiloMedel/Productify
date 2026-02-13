@@ -15,12 +15,21 @@ class TimeSegment {
     var kind: SegmentKind
     var durationSeconds: Int?
     
+    var title: String?
+    
     var config: TimerConfig
     
-    init(order: Int, kind: SegmentKind, durationSeconds: Int?, config: TimerConfig){
+    @Relationship(deleteRule: .cascade, inverse: \TimeSegment.parent)
+    var subSegments: [TimeSegment] = []
+    
+    var parent: TimeSegment?
+    
+    init(order: Int, kind: SegmentKind, durationSeconds: Int?, config: TimerConfig, title: String? = nil, parent: TimeSegment? = nil){
         self.order = order
         self.kind = kind
         self.durationSeconds = durationSeconds
         self.config = config
+        self.title = title
+        self.parent = parent
     }
 }
