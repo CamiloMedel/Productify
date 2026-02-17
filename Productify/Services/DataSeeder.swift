@@ -25,8 +25,8 @@ struct DataSeeder {
         context.insert(pomodoro)
         
         // Pomodoro segments
-        let pomodoro1 = TimeSegment(order: 0, kind: .work, durationSeconds: 25 * 60, config: pomodoro) // 25 minute work session
-        let pomodoro2 = TimeSegment(order: 1, kind: .rest, durationSeconds: 5 * 60, config: pomodoro) // 5 minute study session
+        let pomodoro1 = TimeSegment(kind: .work, durationSeconds: 25 * 60, config: pomodoro) // 25 minute work session
+        let pomodoro2 = TimeSegment(kind: .rest, durationSeconds: 5 * 60, config: pomodoro) // 5 minute study session
         
         context.insert(pomodoro1)
         context.insert(pomodoro2)
@@ -42,8 +42,8 @@ struct DataSeeder {
         context.insert(strength)
         
         // Strength segments
-        let strength1 = TimeSegment(order: 0, kind: .work, durationSeconds: nil, config: strength)
-        let strength2 = TimeSegment(order: 1, kind: .rest, durationSeconds: nil, config: strength)
+        let strength1 = TimeSegment(kind: .work, durationSeconds: nil, config: strength)
+        let strength2 = TimeSegment(kind: .rest, durationSeconds: nil, config: strength)
         context.insert(strength1)
         context.insert(strength2)
         

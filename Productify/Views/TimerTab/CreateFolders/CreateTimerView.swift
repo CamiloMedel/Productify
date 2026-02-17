@@ -17,7 +17,9 @@ struct CreateTimerView: View {
     
     @State private var name: String = ""
     @State private var mode: TimerMode = .countdown
-    @State private var timeSegments: [TimeSegment] = []
+    @State private var timeSegments: [TimeSegmentDraft] = []
+    
+    @State private var isShowingSegmentCreator: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -29,7 +31,8 @@ struct CreateTimerView: View {
                     
                     Picker("Type", selection: $mode) {
                         ForEach (TimerMode.allCases) { mode in
-                            Text(mode.rawValue.capitalized).tag(mode)                        }
+                            Text(mode.rawValue.capitalized).tag(mode)
+                        }
                     }
                 }
                 
@@ -46,7 +49,7 @@ struct CreateTimerView: View {
                             
                             // Add main segment
                             Button {
-                                
+                                isShowingSegmentCreator = true
                             } label: {
                                 Image(systemName: "plus")
                             }
@@ -54,17 +57,14 @@ struct CreateTimerView: View {
                     }
                     
                     // Segment display
-                    ForEach(timeSegments, id: \.self) { segment in
+                    ForEach(timeSegments) { segment in
                         // Segment
                         HStack {
-                            if let title = segment.title {
-                                VStack {
+                            VStack {
+                                if let title = segment.title {
                                     Text(title)
-                                    Text(segment.kind.rawValue.capitalized)
-                                        .font(Font.caption.italic())
                                 }
-                            } else {
-                                Text(segment.kind.rawValue.capitalized)
+                                Text(segment.kind?.rawValue.capitalized ?? "")
                             }
                             
                             Spacer()
@@ -75,18 +75,15 @@ struct CreateTimerView: View {
                         }
                         
                         // Sub segments
-                        ForEach(segment.subSegments, id: \.self) { subSegment in
+                        ForEach(segment.subSegments) { subSegment in
                             HStack {
-                                if let title = segment.title {
-                                    VStack {
+                                VStack {
+                                    if let title = segment.title {
                                         Text(title)
-                                        Text(segment.kind.rawValue.capitalized)
-                                            .font(Font.caption.italic())
                                     }
-                                } else {
-                                    Text(segment.kind.rawValue.capitalized)
+                                    Text(segment.kind?.rawValue.capitalized ?? "")
+                                        .font(Font.caption.italic())
                                 }
-                                
                                 Spacer()
                                 
                                 if let duration = segment.durationSeconds {
@@ -98,19 +95,13 @@ struct CreateTimerView: View {
                     
                     // Inline add segment button
                     Button {
-                        
+                        isShowingSegmentCreator = true
                     } label: {
                         Text("Add Segment")
                     }
                 }
+                
             }
-            .onAppear {
-                // focus on name field on form open
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    isFocused = true
-                }
-            }
-            .scrollDismissesKeyboard(.immediately)
             .navigationTitle("Create Timer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -131,6 +122,16 @@ struct CreateTimerView: View {
                     .tint(isReadyToCreate ? nil : Color(UIColor.systemGray3))
                 }
             }
+        }
+        .onAppear {
+            // focus on name field on form open
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                isFocused = true
+            }
+        }
+        .scrollDismissesKeyboard(.immediately)
+        .sheet(isPresented: $isShowingSegmentCreator) {
+            SegmentCreatorView()
         }
     }
 }

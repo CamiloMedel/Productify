@@ -11,8 +11,7 @@ import SwiftData
 /// Stores the segments order in the config, it's kind, and duration in seconds
 @Model
 class TimeSegment {
-    var order: Int
-    var kind: SegmentKind
+    var kind: SegmentKind?
     var durationSeconds: Int?
     
     var title: String?
@@ -24,8 +23,7 @@ class TimeSegment {
     
     var parent: TimeSegment?
     
-    init(order: Int, kind: SegmentKind, durationSeconds: Int?, config: TimerConfig, title: String? = nil, parent: TimeSegment? = nil){
-        self.order = order
+    init(kind: SegmentKind? = nil, durationSeconds: Int?, config: TimerConfig, title: String? = nil, parent: TimeSegment? = nil){
         self.kind = kind
         self.durationSeconds = durationSeconds
         self.config = config
