@@ -9,10 +9,10 @@ import Foundation
 
 struct TimeSegmentDraft: Hashable, Identifiable {
     let id = UUID()
-    var kind: SegmentKind?
-    var durationSeconds: Int?
+    var kind: SegmentKind = .none
+    var durationSeconds: Int = 0
     
-    var title: String?
+    var title: String = ""
     
     var subSegments: [TimeSegmentDraft] = []
 }

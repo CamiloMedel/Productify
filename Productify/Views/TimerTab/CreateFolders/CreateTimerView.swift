@@ -61,36 +61,36 @@ struct CreateTimerView: View {
                         // Segment
                         HStack {
                             VStack {
-                                if let title = segment.title {
-                                    Text(title)
-                                }
-                                Text(segment.kind?.rawValue.capitalized ?? "")
+                                
+                                Text(segment.title)
+                                
+                                Text(segment.kind.rawValue.capitalized)
                             }
                             
                             Spacer()
                             
-                            if let duration = segment.durationSeconds {
-                                Text("\(duration)")
-                            }
+                           
+                            Text("\(segment.durationSeconds)")
+                            
                         }
                         
                         // Sub segments
-                        ForEach(segment.subSegments) { subSegment in
-                            HStack {
-                                VStack {
-                                    if let title = segment.title {
-                                        Text(title)
-                                    }
-                                    Text(segment.kind?.rawValue.capitalized ?? "")
-                                        .font(Font.caption.italic())
-                                }
-                                Spacer()
-                                
-                                if let duration = segment.durationSeconds {
-                                    Text("\(duration)")
-                                }
-                            }
-                        }
+//                        ForEach(segment.subSegments) { subSegment in
+//                            HStack {
+//                                VStack {
+//                                    if let title = segment.title {
+//                                        Text(title)
+//                                    }
+//                                    Text(segment.kind.rawValue.capitalized)
+//                                        .font(Font.caption.italic())
+//                                }
+//                                Spacer()
+//                                
+//                                if let duration = segment.durationSeconds {
+//                                    Text("\(duration)")
+//                                }
+//                            }
+//                        }
                     }
                     
                     // Inline add segment button
@@ -122,6 +122,9 @@ struct CreateTimerView: View {
                     .tint(isReadyToCreate ? nil : Color(UIColor.systemGray3))
                 }
             }
+            .navigationDestination(isPresented: $isShowingSegmentCreator) {
+                SegmentCreatorView()
+            }
         }
         .onAppear {
             // focus on name field on form open
@@ -130,9 +133,6 @@ struct CreateTimerView: View {
             }
         }
         .scrollDismissesKeyboard(.immediately)
-        .sheet(isPresented: $isShowingSegmentCreator) {
-            SegmentCreatorView()
-        }
     }
 }
 

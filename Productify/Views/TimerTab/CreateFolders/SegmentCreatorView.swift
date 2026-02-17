@@ -16,7 +16,6 @@ struct SegmentCreatorView: View {
     // properties for making timer segment
     @State private var name: String = ""
     @State private var kind: SegmentKind = .none
-    private let parent: TimeSegmentDraft? = nil
     
     // Time tracking
     @State private var hours = 0
@@ -26,13 +25,19 @@ struct SegmentCreatorView: View {
         hours * 3600 + minutes * 60 + seconds
     }
     
+    @State private var subsegmentDrafts: [TimeSegmentDraft] = []
+    @State private var isShowingSubsegmentCreator = false
+    var availableTimeForSubsegments : String {
+        "\(hours)h \(minutes)m \(seconds)s"
+    }
+    
     var body: some View {
-        NavigationStack {
+        VStack {
             Form {
                 Section {
                     TextField("Name", text: $name)
                     
-                    Picker("Type", selection: $kind) {
+                    Picker("Kind", selection: $kind) {
                         ForEach (SegmentKind.allCases) { mode in
                             Text(mode.rawValue.capitalized).tag(mode)
                         }
@@ -47,30 +52,63 @@ struct SegmentCreatorView: View {
                         Spacer()
                     }
                     
-                    
                     // subsegments field
+                    VStack(alignment: .leading) {
+                        // header
+                        HStack {
+                            Text("Subsegments")
+                            
+                            Spacer()
+                            // Add subsegment
+                            Button {
+                                isShowingSubsegmentCreator = true
+                            } label: {
+                                Image(systemName: "plus")
+                            }
+                        }
                         
+                        // available time for subsegments display
+                        HStack {
+                            Text("Available Time: \(hours)h \(minutes)m \(seconds)s")
+                                .foregroundStyle(.secondary)
+                                .font(Font.caption.bold())
+                        }
+                        
+                        // TODO:  SUBSEGMENTS DISPLAY
+                        List(subsegmentDrafts) { subsegment in
+                            HStack {
+                                VStack {
+                                    Text(subsegment.title)
+                                    Text("Type: \(subsegment.kind.rawValue.capitalized)")
+                                }
+                                Spacer()
+                                Text("\(subsegment.durationSeconds)")
+                            }
+                        }
+                    }
+                    
+                    // Inline add subsegment button
+                    Button {
+                        isShowingSubsegmentCreator = true
+                    } label: {
+                        Text("Add Subsegment")
+                    }
                 }
             }
             .navigationBarTitle("Create Segment")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                    }
-                }
-                
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
                         // create timer
+                        // TODO: SEGMENT CREATION AND VALIDATION WITH SUBSEGMENTS
                     } label: {
                         Label("Create", systemImage: "checkmark")
                     }
                     .tint(isReadyToCreate ? nil : Color(UIColor.systemGray3))
                 }
+            }
+            .navigationDestination(isPresented: $isShowingSubsegmentCreator) {
+                SubsegmentCreatorView()
             }
         }
     }
