@@ -29,10 +29,15 @@ struct CreateTimerView: View {
                     TextField("Name", text: $name)
                         .focused($isFocused)
                     
-                    Picker("Type", selection: $mode) {
+                    Picker("Mode", selection: $mode) {
                         ForEach (TimerMode.allCases) { mode in
                             Text(mode.rawValue.capitalized).tag(mode)
                         }
+                    }
+                    .onChange(of: mode) {
+                        // mode changes when we switch to stopwatch mode.
+                        // timer is ready to create when stopwatch mode is active.
+                        isReadyToCreate.toggle()
                     }
                 }
                 
@@ -40,7 +45,7 @@ struct CreateTimerView: View {
                 Section {
                     // Header
                     HStack {
-                        Text("Time Segments")
+                        Text("Time \(mode == .countdown ? "Intervals" : "Sections")")
                         Spacer()
                         HStack {
                             if timeSegments.count > 0 {
@@ -97,7 +102,7 @@ struct CreateTimerView: View {
                     Button {
                         isShowingSegmentCreator = true
                     } label: {
-                        Text("Add Segment")
+                        Text("Add \(mode == .countdown ? "Interval" : "Section")")
                     }
                 }
                 
@@ -123,7 +128,7 @@ struct CreateTimerView: View {
                 }
             }
             .navigationDestination(isPresented: $isShowingSegmentCreator) {
-                SegmentCreatorView()
+                SegmentCreatorView(parentMode: mode)
             }
         }
         .onAppear {

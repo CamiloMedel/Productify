@@ -25,10 +25,19 @@ struct SegmentCreatorView: View {
         hours * 3600 + minutes * 60 + seconds
     }
     
+    @State private var isSubsegmentsEnabled: Bool = false
+    
     @State private var subsegmentDrafts: [TimeSegmentDraft] = []
     @State private var isShowingSubsegmentCreator = false
     var availableTimeForSubsegments : String {
         "\(hours)h \(minutes)m \(seconds)s"
+    }
+    
+    let parentMode: TimerMode
+    @State private var segmentMode: TimerMode = .countdown
+    
+    var displaySuffixString: String {
+        segmentMode == .countdown ? "interval" : "section"
     }
     
     var body: some View {
@@ -37,65 +46,76 @@ struct SegmentCreatorView: View {
                 Section {
                     TextField("Name", text: $name)
                     
-                    Picker("Kind", selection: $kind) {
+                    Picker("Category", selection: $kind) {
                         ForEach (SegmentKind.allCases) { mode in
                             Text(mode.rawValue.capitalized).tag(mode)
                         }
                     }
                 }
                 
-                Section("Total Duration"){
-                    HStack {
-                        // total duration field
-                        Spacer()
-                        DurationPickerWithLabels(hours: $hours, minutes: $minutes, seconds: $seconds)
-                        Spacer()
-                    }
-                    
-                    // subsegments field
-                    VStack(alignment: .leading) {
-                        // header
+                if segmentMode == .countdown {
+                    Section("Total Duration"){
                         HStack {
-                            Text("Subsegments")
-                            
+                            // total duration field
                             Spacer()
-                            // Add subsegment
-                            Button {
-                                isShowingSubsegmentCreator = true
-                            } label: {
-                                Image(systemName: "plus")
-                            }
-                        }
-                        
-                        // available time for subsegments display
-                        HStack {
-                            Text("Available Time: \(hours)h \(minutes)m \(seconds)s")
-                                .foregroundStyle(.secondary)
-                                .font(Font.caption.bold())
-                        }
-                        
-                        // TODO:  SUBSEGMENTS DISPLAY
-                        List(subsegmentDrafts) { subsegment in
-                            HStack {
-                                VStack {
-                                    Text(subsegment.title)
-                                    Text("Type: \(subsegment.kind.rawValue.capitalized)")
-                                }
-                                Spacer()
-                                Text("\(subsegment.durationSeconds)")
-                            }
+                            DurationPickerWithLabels(hours: $hours, minutes: $minutes, seconds: $seconds)
+                            Spacer()
                         }
                     }
+                }
+                
+                // subsegments section
+                Section {
+                    Toggle("Sub\(displaySuffixString)s", isOn: $isSubsegmentsEnabled)
                     
-                    // Inline add subsegment button
-                    Button {
-                        isShowingSubsegmentCreator = true
-                    } label: {
-                        Text("Add Subsegment")
+                    if(isSubsegmentsEnabled) {
+                        // subsegments field
+                        VStack(alignment: .leading) {
+                            // header
+                            HStack {
+                                Text("Sub\(displaySuffixString)")
+                                
+                                Spacer()
+                                // Add subsegment
+                                Button {
+                                    isShowingSubsegmentCreator = true
+                                } label: {
+                                    Image(systemName: "plus")
+                                }
+                            }
+                            
+                            // available time for subsegments display
+                            if segmentMode == .countdown {
+                                HStack {
+                                    Text("Available Time: \(hours)h \(minutes)m \(seconds)s")
+                                        .foregroundStyle(.secondary)
+                                        .font(Font.caption.bold())
+                                }
+                            }
+                            
+                            // TODO:  SUBSEGMENTS DISPLAY
+                            List(subsegmentDrafts) { subsegment in
+                                HStack {
+                                    VStack {
+                                        Text(subsegment.title)
+                                        Text("Type: \(subsegment.kind.rawValue.capitalized)")
+                                    }
+                                    Spacer()
+                                    Text("\(subsegment.durationSeconds)")
+                                }
+                            }
+                        }
+                        
+                        // Inline add subsegment button
+                        Button {
+                            isShowingSubsegmentCreator = true
+                        } label: {
+                            Text("Add Sub\(displaySuffixString)")
+                        }
                     }
                 }
             }
-            .navigationBarTitle("Create Segment")
+            .navigationBarTitle("Create \(displaySuffixString.capitalized)")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
@@ -108,7 +128,13 @@ struct SegmentCreatorView: View {
                 }
             }
             .navigationDestination(isPresented: $isShowingSubsegmentCreator) {
-                SubsegmentCreatorView()
+                SubsegmentCreatorView(parentTimerMode: segmentMode) { subsegment in
+                    subsegmentDrafts.append(subsegment)
+                }
+            }
+            .onAppear {
+                // TODO: MAKE SEGMENT MODE THE PROPER MODE IF SEGMENET IS BEING EDITED, ELSE MAKE IT PARENT MODE
+                segmentMode = parentMode
             }
         }
     }

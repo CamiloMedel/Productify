@@ -11,4 +11,5 @@ enum TimerMode: String, Codable, CaseIterable, Identifiable {
     
     case countdown  // automatic phase switches based on time
     case stopwatch  // usere manually advances the phase
+    //case mix // user can create a timer with both countdown and intervals mode
 }
